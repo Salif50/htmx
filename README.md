@@ -123,3 +123,151 @@ HTMX utilise des attributs HTML spéciaux pour ajouter des fonctionnalités dyna
 Ces attributs ajoutent des fonctionnalités et un comportement spécifique aux requêtes HTMX, ce qui permet une plus grande flexibilité dans la manière dont vous concevez et gérez les interactions de votre site web. Il est important de choisir les attributs appropriés en fonction des besoins de votre application.
 
 Ces attributs sont essentiels pour définir le comportement des requêtes HTMX et pour mettre à jour dynamiquement le contenu des pages web sans recharger complètement la page.
+
+# Exemple avec CRUD
+
+1. **Modèle pour l'article** :
+
+```python
+# models.py
+
+from django.db import models
+
+class Article(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+
+    def __str__(self):
+        return self.title
+```
+
+2. **Formulaire pour l'article** :
+
+```python
+# forms.py
+
+from django import forms
+from .models import Article
+
+class ArticleForm(forms.ModelForm):
+    class Meta:
+        model = Article
+        fields = ['title', 'content']
+```
+
+3. **Vues pour gérer les articles** :
+
+```python
+# views.py
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views import View
+from django.http import JsonResponse
+from django.urls import reverse_lazy
+from .models import Article
+from .forms import ArticleForm
+
+class ArticleListView(View):
+    def get(self, request):
+        articles = Article.objects.all()
+        return render(request, 'article_list.html', {'articles': articles})
+
+class ArticleDetailView(View):
+    def get(self, request, pk):
+        article = get_object_or_404(Article, pk=pk)
+        return JsonResponse({'title': article.title, 'content': article.content})
+
+class ArticleCreateView(View):
+    def post(self, request):
+        form = ArticleForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'message': 'Article ajouté avec succès!'}, status=201)
+        else:
+            return JsonResponse({'error': 'Erreur de validation'}, status=400)
+
+class ArticleUpdateView(View):
+    def patch(self, request, pk):
+        article = get_object_or_404(Article, pk=pk)
+        form = ArticleForm(request.POST, instance=article)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'message': 'Article mis à jour avec succès!'})
+        else:
+            return JsonResponse({'error': 'Erreur de validation'}, status=400)
+
+class ArticleDeleteView(View):
+    def delete(self, request, pk):
+        article = get_object_or_404(Article, pk=pk)
+        article.delete()
+        return JsonResponse({'message': 'Article supprimé avec succès!'})
+```
+
+4. **URLs pour les vues** :
+
+```python
+# urls.py
+
+from django.urls import path
+from .views import ArticleListView, ArticleDetailView, ArticleCreateView, ArticleUpdateView, ArticleDeleteView
+
+urlpatterns = [
+    path('', ArticleListView.as_view(), name='article_list'),
+    path('detail/<int:pk>/', ArticleDetailView.as_view(), name='article_detail'),
+    path('add/', ArticleCreateView.as_view(), name='article_add'),
+    path('update/<int:pk>/', ArticleUpdateView.as_view(), name='article_update'),
+    path('delete/<int:pk>/', ArticleDeleteView.as_view(), name='article_delete'),
+]
+```
+
+5. **Templates pour les vues** :
+
+- `article_list.html` :
+
+```html
+<!-- article_list.html -->
+
+<h1>Liste des Articles</h1>
+
+<ul>
+  {% for article in articles %}
+    <li>{{ article.title }} - <button hx-get="{% url 'article_detail' article.id %}" hx-trigger="click" hx-target="#article-detail" hx-swap="outerHTML">Voir détails</button></li>
+  {% endfor %}
+</ul>
+
+<div id="article-detail">
+  <!-- Les détails de l'article seront chargés ici -->
+</div>
+```
+
+- `article_detail.html` :
+
+```html
+<!-- article_detail.html -->
+
+<h1>Détails de l'Article</h1>
+
+<h2>{{ title }}</h2>
+<p>{{ content }}</p>
+
+<button hx-get="{% url 'article_list' %}" hx-trigger="click" hx-target="#article-list" hx-swap="outerHTML">Retour à la liste</button>
+```
+
+- `article_form.html` (utilisé pour l'ajout et la mise à jour d'articles) :
+
+```html
+<!-- article_form.html -->
+
+<h1>{% if article.id %}Modifier{% else %}Ajouter{% endif %} un Article</h1>
+
+<form {% if article.id %}hx-patch="{% url 'article_update' article.id %}"{% else %}hx-post="{% url 'article_add' %}"{% endif %} hx-trigger="submit" hx-target="#article-list" hx-swap="outerHTML">
+  {% csrf_token %}
+  <label for="title">Titre :</label>
+  <input type="text" id="title" name="title" value="{{ article.title }}" required><br>
+  <label for="content">Contenu :</label>
+  <textarea id="content" name="content" required>{{ article.content }}</textarea><br>
+  <button type="submit">{% if article.id %}Mettre à jour{% else %}Ajouter{% endif %} l'article</button>
+</form>
+```
+
+Avec ces éléments, vous avez la structure de base pour gérer les articles avec les fonctionnalités d'ajout, de modification, de suppression et de listing en utilisant HTMX. Vous pouvez personnaliser davantage les templates et les vues en fonction de vos besoins spécifiques.
