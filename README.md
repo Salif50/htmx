@@ -59,4 +59,67 @@ HTMX utilise des attributs HTML spéciaux pour ajouter des fonctionnalités dyna
    <div hx-get="/api/data" hx-trigger="click" hx-target="#result" hx-swap="outerHTML">Initial Content</div>
    ```
 
+
+7. **`hx-confirm`** :
+   L'attribut `hx-confirm` permet de demander une confirmation de l'utilisateur avant d'effectuer une action. Il affiche une boîte de dialogue de confirmation basée sur le navigateur.
+
+   Exemple :
+   ```html
+   <button hx-post="/api/delete" hx-trigger="click" hx-confirm="Êtes-vous sûr de vouloir supprimer ?">Supprimer</button>
+   ```
+
+8. **`hx-boost`** :
+   L'attribut `hx-boost` permet de définir des options de performance pour les requêtes HTMX. Il peut être utilisé pour spécifier le prefetching, le prerendering et d'autres améliorations de performances.
+
+   Exemple :
+   ```html
+   <div hx-get="/api/data" hx-trigger="click" hx-boost="true"></div>
+   ```
+
+9. **`hx-headers`** :
+   L'attribut `hx-headers` vous permet d'ajouter des en-têtes personnalisés à votre requête HTTP.
+
+   Exemple :
+   ```html
+   <button hx-get="/api/data" hx-trigger="click" hx-headers="{'Authorization': 'Bearer myToken'}">Charger les données</button>
+   ```
+
+10. **`hx-indicator`** :
+    L'attribut `hx-indicator` permet d'afficher un indicateur de chargement pendant la requête HTMX.
+
+    Exemple :
+    ```html
+    <button hx-get="/api/data" hx-trigger="click" hx-indicator="loading...">Charger les données</button>
+    ```
+
+11. **`hx-prompt`** :
+    L'attribut `hx-prompt` permet de demander une saisie de l'utilisateur avant d'effectuer une action.
+
+    Exemple :
+    ```html
+    <button hx-post="/api/update" hx-trigger="click" hx-prompt="Nouvelle valeur :">Mettre à jour</button>
+    ```
+
+12. **`hx-select`** :
+    L'attribut `hx-select` permet de définir un sélecteur CSS pour cibler un élément spécifique pour la mise à jour après la requête HTMX.
+
+    Exemple :
+    ```html
+    <button hx-get="/api/data" hx-trigger="click" hx-target="#result" hx-select=".data-item"></button>
+    ```
+
+13. **`hx-preserve`** :
+    L'attribut `hx-preserve` permet de conserver les données du formulaire lors d'un échec de soumission.
+
+    Exemple :
+    ```html
+    <form hx-post="/api/save" hx-trigger="submit" hx-target="#result" hx-preserve="true">
+      <!-- Champs du formulaire -->
+      <input type="text" name="name" />
+      <button type="submit">Enregistrer</button>
+    </form>
+    ```
+
+Ces attributs ajoutent des fonctionnalités et un comportement spécifique aux requêtes HTMX, ce qui permet une plus grande flexibilité dans la manière dont vous concevez et gérez les interactions de votre site web. Il est important de choisir les attributs appropriés en fonction des besoins de votre application.
+
 Ces attributs sont essentiels pour définir le comportement des requêtes HTMX et pour mettre à jour dynamiquement le contenu des pages web sans recharger complètement la page.
