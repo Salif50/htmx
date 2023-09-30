@@ -1,0 +1,9 @@
+{% for produit in produits %}
+<tr >
+  <td>{{produit.designation}}</td>
+  <td> {{produit.prix}} GNF </td>
+  <td> {{produit.quantite}} </td>
+  <td><button class="btn btn-danger" hx-get="{% url 'delete' produit.id %}" hx-target="closest tr" hx-swap="outerHTML" hx-confirm="voulez vous vraiment supprimer ce produit">supprimer</button></td>
+</tr>
+{% endfor %}
+

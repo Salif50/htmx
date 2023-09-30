@@ -1,0 +1,6 @@
+<tr>
+    <td>{{produit.designation}}</td>
+    <td> {{produit.prix}} GNF </td>
+    <td> {{produit.quantite}} </td>
+    <td><button class="btn btn-danger" hx-get="{% url 'delete' produit.id %}" hx-target="closest tr" hx-swap="outerHTML swap:30ms">supprimer</button></td>
+  </tr>
